@@ -6,7 +6,7 @@ import { redirect } from "next/dist/server/api-utils";
 
 function getGoogleCredentials() {
 	const clientID = process.env.GOOGLE_CLIENT_ID;
-	const clientSecret = process.env.Google_CLIENT_SECRET;
+	const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
 	if (!clientID || clientID.length == 0)
 		throw new Error("Google credentials missing");
