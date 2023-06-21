@@ -27,7 +27,7 @@ export default withAuth(
 		if (!isAuth && isAccessingSensitiveRoutes) {
 			return NextResponse.redirect(new URL("/login", req. url));
         }
-        console.log('heyyyy')
+   
 
 		if (pathname === "/") {
 			return NextResponse.redirect(new URL("/dashboard", req.url));
