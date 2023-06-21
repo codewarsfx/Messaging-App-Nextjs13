@@ -9,6 +9,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FC, ReactNode } from "react";
+import { getFriendByUserID } from "@/helpers/get-friends-by-id";
+import SidebarChatList from "@/components/SidebarChatList";
 
 interface Layoutprops {
 	children: ReactNode;
@@ -34,19 +36,30 @@ const Layout = async ({ children }: Layoutprops) => {
 	const session = await getServerSession(authOptions);
 
 	if (!session) notFound();
-	const initialCount = (await fetchRedis("smembers", `user:${session.user.id}:incoming_friend_requests`) as User[]).length;
+	const initialCount = (
+		(await fetchRedis(
+			"smembers",
+			`user:${session.user.id}:incoming_friend_requests`
+		)) as User[]
+	).length;
+
+	const friends = await getFriendByUserID(session.user.id);
 	return (
 		<div className='w-full flex h-screen'>
 			<div className='flex h-full w-full max-w-sm  grow  flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6'>
 				<Link className='flex h-16 shrink-0 items-center' href='/dashboard'>
 					<Icons.Logo className='h-8 w-auto text-indigo-200' />
 				</Link>
-				<div className='text-xs font-semibold leading-6 text-gray-400'>
-					Your chats
-				</div>
+				{friends.length > 0 ? (
+					<div className='text-xs font-semibold leading-6 text-gray-400'>
+						Your chats
+					</div>
+				) : null}
 				<nav className='flex flex-1 flex-col'>
 					<ul role='list' className='flex flex-1 flex-col gap-y-7 '>
-						<li>//chats</li>
+						<li>
+							<SidebarChatList friends={friends} />
+						</li>
 						<li>
 							<div className='text-xs font-semibold leading-6 text-gray-400'>
 								Overview
@@ -68,14 +81,15 @@ const Layout = async ({ children }: Layoutprops) => {
 										</li>
 									);
 								})}
+								<li>
+									<FriendRequestsSidebarOption
+										sessionId={session.user.id}
+										initialCount={initialCount}
+									/>
+								</li>
 							</ul>
 						</li>
-						<li>
-							<FriendRequestsSidebarOption
-								sessionId={session.user.id}
-								initialCount={initialCount}
-							/>
-						</li>
+
 						<li className='-mx-6 mt-auto flex items-center'>
 							<div className='flex gap-x-4 items-center px-6 py-3 flex-1 text-sm font-semibold leading-6 text-gray-900 '>
 								<div className='relative h-8 w-8 bg-gray-50'>
