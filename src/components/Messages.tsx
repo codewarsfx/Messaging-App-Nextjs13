@@ -2,6 +2,7 @@
 import { FC, useRef, useState } from "react";
 import { Message } from "@/lib/validations/message";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface MessagesProps {
 	initialMessages: Message[];
@@ -10,6 +11,10 @@ interface MessagesProps {
 
 const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
 	const [messages, setMessages] = useState(initialMessages);
+
+	function formatTimestamps(timestamp: number) {
+		return format(timestamp, "HH:MM");
+	}
 	const scrollDownRef = useRef<HTMLDivElement | null>(null);
 	return (
 		<div
@@ -28,8 +33,8 @@ const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
 						key={`${message.id}-${message.timestamp}`}
 					>
 						<div
-							className={cn("flex items-end", {
-								"justify-end": isCurrentUSer,
+							className={cn("flex  items-end", {
+								"justify-end ": isCurrentUSer,
 							})}
 						>
 							<div
@@ -45,14 +50,16 @@ const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
 									className={cn("px-4 py-2 rounded-lg inline-block", {
 										"bg-indigo-600 text-white": isCurrentUSer,
 										"bg-gray-200 text-gray-900": !isCurrentUSer,
-										"bottom-br-none":
+										"rounded-br-none":
 											!hasNextMessageFromSameUser && isCurrentUSer,
-										"bottom-bl-none":
+										"rounded-bl-none":
 											!hasNextMessageFromSameUser && !isCurrentUSer,
 									})}
 								>
 									{message.text}{" "}
-									<span className='ml-2 text-xs'>{message.timestamp}</span>
+									<span className='ml-2 text-xs'>
+										{formatTimestamps(message.timestamp)}
+									</span>
 								</span>
 							</div>
 						</div>

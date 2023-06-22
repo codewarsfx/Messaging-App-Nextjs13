@@ -19,10 +19,11 @@ async function getChatMessages(chatid: string) {
 	try {
 		const result: string[] = await fetchRedis(
 			"zrange",
-			`chat:${chatid}messages`,
+			`chat:${chatid}:messsages`,
 			0,
 			-1
 		);
+
 
 		const dbMessage = result.map((message) => JSON.parse(message) as Message);
 
@@ -30,6 +31,8 @@ async function getChatMessages(chatid: string) {
 
 		const messages = messageArrayValidator.parse(reversedDbMessage);
 
+
+		
 		return messages;
 	} catch (e) {
 		notFound();
