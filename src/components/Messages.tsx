@@ -9,6 +9,8 @@ interface MessagesProps {
 	sessionId: string;
 }
 
+//messages
+
 const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
 	const [messages, setMessages] = useState(initialMessages);
 
