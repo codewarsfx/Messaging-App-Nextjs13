@@ -5,7 +5,7 @@ export default withAuth(
 	async function middleware(req) {
 		const pathname = req.nextUrl.pathname;
 
-		//manage routh protection
+		//manage routh protections
 
 		const isAuth = await getToken({ req });
 
