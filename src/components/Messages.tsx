@@ -1,26 +1,49 @@
 "use client";
-import { FC, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Message } from "@/lib/validations/message";
-import { cn } from "@/lib/utils";
+import { cn, toPusherKey } from "@/lib/utils";
 import { format } from "date-fns";
 import Image from "next/image";
+import { pusherclient } from "@/lib/pusher";
 
 interface MessagesProps {
 	initialMessages: Message[];
 	sessionId: string;
-	sessionImg: string | null | undefined
-	chatPartner : User
+	sessionImg: string | null | undefined;
+	chatPartner: User;
+	chatid: string;
 }
 
 //messages
 
-const Messages: FC<MessagesProps> = ({ initialMessages, sessionId, sessionImg,chatPartner }) => {
+const Messages: FC<MessagesProps> = ({
+	initialMessages,
+	chatid,
+	sessionId,
+	sessionImg,
+	chatPartner,
+}) => {
 	const [messages, setMessages] = useState(initialMessages);
 
 	function formatTimestamps(timestamp: number) {
 		return format(timestamp, "HH:MM");
 	}
 	const scrollDownRef = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		pusherclient.subscribe(toPusherKey(`chat:${chatid}`));
+
+		const messageHandler = (message: Message) => {
+			setMessages((prev) => [message, ...prev]);
+		};
+		pusherclient.bind("incoming-message", messageHandler);
+
+		return () => {
+			pusherclient.unsubscribe(toPusherKey(`chat:${chatid}`));
+			pusherclient.unbind("incoming-message", messageHandler);
+		};
+	}, []);
+
 	return (
 		<div
 			id='messages'
@@ -67,17 +90,21 @@ const Messages: FC<MessagesProps> = ({ initialMessages, sessionId, sessionImg,ch
 									</span>
 								</span>
 							</div>
-							<div className={cn("relative w-6 h-6", {
-								'order-2': isCurrentUSer,
-								'order-1': !isCurrentUSer,
-								'invisible' : hasNextMessageFromSameUser
-							})}>
+							<div
+								className={cn("relative w-6 h-6", {
+									"order-2": isCurrentUSer,
+									"order-1": !isCurrentUSer,
+									invisible: hasNextMessageFromSameUser,
+								})}
+							>
 								<Image
 									fill
-									src={isCurrentUSer ? (sessionImg as string) : chatPartner.image}
-									alt="profile picture"
-									referrerPolicy="no-referrer"
-									className="rounded-full"
+									src={
+										isCurrentUSer ? (sessionImg as string) : chatPartner.image
+									}
+									alt='profile picture'
+									referrerPolicy='no-referrer'
+									className='rounded-full'
 								/>
 							</div>
 						</div>
