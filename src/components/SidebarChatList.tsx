@@ -64,9 +64,10 @@ const SidebarChatList: FC<SidebarChatListProps> = ({ friends, sessionid }) => {
 		return () => {
 			pusherclient.unsubscribe(toPusherKey(`user:${sessionid}:chats`));
 			pusherclient.unsubscribe(toPusherKey(`user:${sessionid}:friends`));
-			pusherclient.unbind("incoming-message", newfriendHandler);
+			pusherclient.unbind("new_message", newfriendHandler);
+			pusherclient.unbind("new_friend", newfriendHandler);
 		};
-	}, [pathname,sessionid,router]);
+	}, [pathname, sessionid, router]);
 
 	return (
 		<ul role='list' className='max-h-25rem overflow-y-auto -mx-2 space-y-1'>
@@ -85,12 +86,11 @@ const SidebarChatList: FC<SidebarChatListProps> = ({ friends, sessionid }) => {
 						>
 							{friend.name}
 							{unseenMessgaesCount > 0 ? (
-							<div className='bg-indigo-600 p-2 text-white font-medium text-xs text-whit w-4 h-4 rounded-full flex justify-center items-center'>
-								{unseenMessgaesCount}
-							</div>
-						) : null}
+								<div className='bg-indigo-600 p-2 text-white font-medium text-xs text-whit w-4 h-4 rounded-full flex justify-center items-center'>
+									{unseenMessgaesCount}
+								</div>
+							) : null}
 						</a>
-				
 					</li>
 				);
 			})}
