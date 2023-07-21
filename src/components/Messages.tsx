@@ -3,15 +3,18 @@ import { FC, useRef, useState } from "react";
 import { Message } from "@/lib/validations/message";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import Image from "next/image";
 
 interface MessagesProps {
 	initialMessages: Message[];
 	sessionId: string;
+	sessionImg: string | null | undefined
+	chatPartner : User
 }
 
 //messages
 
-const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
+const Messages: FC<MessagesProps> = ({ initialMessages, sessionId, sessionImg,chatPartner }) => {
 	const [messages, setMessages] = useState(initialMessages);
 
 	function formatTimestamps(timestamp: number) {
@@ -63,6 +66,19 @@ const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
 										{formatTimestamps(message.timestamp)}
 									</span>
 								</span>
+							</div>
+							<div className={cn("relative w-6 h-6", {
+								'order-2': isCurrentUSer,
+								'order-1': !isCurrentUSer,
+								'invisible' : hasNextMessageFromSameUser
+							})}>
+								<Image
+									fill
+									src={isCurrentUSer ? (sessionImg as string) : chatPartner.image}
+									alt="profile picture"
+									referrerPolicy="no-referrer"
+									className="rounded-full"
+								/>
 							</div>
 						</div>
 					</div>

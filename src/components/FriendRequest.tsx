@@ -1,9 +1,11 @@
 "use client";
 import { Check, UserPlus, X } from "lucide-react";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { pusherclient } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 
 interface FriendRequestProps {
 	initialIncomingRequests: IncomingFriendRequests[];
@@ -17,6 +19,33 @@ const FriendRequest: FC<FriendRequestProps> = ({
 	const [incomingRequest, setIncomingRequest] = useState<
 		IncomingFriendRequests[]
 	>(initialIncomingRequests);
+
+	useEffect(() => {
+		pusherclient.subscribe(
+			toPusherKey(`user:${sessionID}:incoming_friend_requests`)
+		);
+
+		const friendRequestHandler = ({
+			senderID,
+			senderEmail,
+		}: IncomingFriendRequests) => {
+			setIncomingRequest((prev) => [
+				...prev,
+				{
+					senderID,
+					senderEmail,
+				},
+			]);
+		};
+		pusherclient.bind("incoming_friend_requests", friendRequestHandler);
+
+		return () => {
+			pusherclient.unsubscribe(
+				toPusherKey(`user:${sessionID}:incoming_friend_requests`)
+			);
+			pusherclient.unbind("incoming_friend_requests", friendRequestHandler);
+		};
+	}, []);
 
 	const router = useRouter();
 
