@@ -45,7 +45,7 @@ const FriendRequest: FC<FriendRequestProps> = ({
 			);
 			pusherclient.unbind("incoming_friend_requests", friendRequestHandler);
 		};
-	}, []);
+	}, [sessionID]);
 
 	const router = useRouter();
 
