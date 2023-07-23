@@ -1,6 +1,6 @@
 import { UpstashRedisAdapter } from "@next-auth/upstash-redis-adapter";
 import { NextAuthOptions } from "next-auth";
-import { db } from "./db";
+import { db } from "./db"
 import GoogleProvider from "next-auth/providers/google";
 import { redirect } from "next/dist/server/api-utils";
 
